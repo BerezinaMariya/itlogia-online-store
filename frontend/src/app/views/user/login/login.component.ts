@@ -6,7 +6,6 @@ import {DefaultResponseType} from "../../../../types/default-response.type";
 import {HttpErrorResponse} from "@angular/common/http";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {Router} from "@angular/router";
-import {CartService} from "../../../shared/services/cart.service";
 
 @Component({
   selector: 'app-login',
@@ -14,8 +13,6 @@ import {CartService} from "../../../shared/services/cart.service";
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit {
-
-  count: number = 0;
 
   loginForm = this.fb.group({
     email: ['', [Validators.email, Validators.required]],
@@ -25,16 +22,10 @@ export class LoginComponent implements OnInit {
 
   constructor(private fb: FormBuilder,
               private authService: AuthService,
-              private cartService: CartService,
               private _snackBar: MatSnackBar,
               private router: Router) { }
 
-  ngOnInit(): void {
-    this.cartService.count$
-      .subscribe(count => {
-        this.count = count;
-      });
-  }
+  ngOnInit(): void {}
 
   login(): void {
     if (this.loginForm.valid && this.loginForm.value.email && this.loginForm.value.password) {
@@ -62,15 +53,6 @@ export class LoginComponent implements OnInit {
 
             this._snackBar.open('Вы успешно авторизовались');
             this.router.navigate(['/']);
-
-            this.cartService.getCartCount()
-              .subscribe((data: { count: number } | DefaultResponseType) => {
-                if ((data as DefaultResponseType).error !== undefined) {
-                  throw new Error((data as DefaultResponseType).message);
-                }
-
-                this.count = (data as { count: number }).count;
-              });
           },
           error: (errorResponse: HttpErrorResponse) => {
             if (errorResponse.error && errorResponse.error.message) {
